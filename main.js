@@ -1,8 +1,8 @@
-onst gameboard = (function(){
+const gameboard = (function(){
   let board = [
-  ["7","7","3",],
-  ["7","3","7",],
-  ["3","7","7",]
+  ["","","",],
+  ["","","",],
+  ["","","",]
   ]
   let Reset = function Reset(){
     board = [
@@ -22,12 +22,30 @@ onst gameboard = (function(){
   }
   return{Reset,Mark,Log,GetBoardStateCopy}
 })();
+const DisplayController = (function(){
+    let player1input = document.querySelector("#playeronename")
+    let player2input = document.querySelector("#playertwoname")
+    let submitbutton = document.querySelector("#PlayerNameButton")
+    let Formsubmit = function Formsubmit(event){
+      let player1inputvalue = player1input.value
+      let player2inputvalue = player2input.value
+      let player1 = CreateUser(player1inputvalue,1,"X")
+      let player2 = CreateUser(player2inputvalue,2,"Y")
+      gamecontroller.setplayers(player1,player2)
+    }
+    submitbutton.addEventListener("click",Formsubmit)
 
-function CreateUser(name,number,marker){
-  return{name,number,marker}
+    
+    return{Formsubmit}
+
+})();
+function CreateUser(name,playernumber,marker){
+  return{name,playernumber,marker}
 }
 
 const gamecontroller = (function(){
+  let player1
+  let player2
   let checkwin = function checkwin(){
     let boardcopy = gameboard.GetBoardStateCopy()
     // check if any row wins and the token
@@ -76,11 +94,15 @@ const gamecontroller = (function(){
         }
     }
     }
-
-    return{checkwin}
+  let setplayers = function setplayers(p1,p2){
+    console.log("TEST")
+    player1 = p1
+    player2 = p2
+    console.log(player1 + player2)
+  }
+  return{checkwin,setplayers}
 
 })();
 
-console.log(gamecontroller.checkwin())
-let player1 = CreateUser("Matthew",1,"X")
-console.log(player1)
+
+

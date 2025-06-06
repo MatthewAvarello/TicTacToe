@@ -8,13 +8,31 @@
     <script defer src="main.js"></script>
 </head>
 <body>
-    <form action="" id="">
+    <form action="" id="nameform">
         <h2>Choose names</h2>
         <label for="playeronename">Player 1:</label>
         <input type="text" id="playeronename" required maxlength="20">
         <label for="playertwoname">Player 2:</label>
         <input type="text" id="playertwoname" required maxlength="20">
-        <button type="submit" id="PlayerNameButton">Submit</button>
+        <button type="submit" id="PlayerNameButton">Lets Play!</button>
     </form>
+    <div id="Main">
+        <h3>Players Turn</h3>
+        <div id="tictactoecont">
+            <p>a</p><!--Temporary to look at how the styling will look-->
+            <p>b</p>
+            <p>c</p>
+            <p>d</p>
+            <p>e</p>
+            <p>f</p>
+            <p>g</p>
+            <p>h</p>
+            <p>i</p>
+        </div>
+    </div>
+    <div id="Winner">
+        <p id="WinnerText">Player 1 Won!</p>
+        <button id="PlayAgain">Play Again?</button>
+    </div>
 </body>
 </html>

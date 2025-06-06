@@ -1,8 +1,8 @@
 const gameboard = (function(){
   let board = [
-  ["x","0","x",],
-  ["x","0","0",],
-  ["0","x","x",]
+  ["X","O","X",],
+  ["X","","O",],
+  ["O","X","X",]
   ]
   let Reset = function Reset(){
     board = [
@@ -12,8 +12,11 @@ const gameboard = (function(){
       ]
   }
   let Mark = function Mark(marker,positionx,positiony){
+    if (board[positiony][positionx] != ""){
+        console.log("Invalid Input")
+        return "Invalid"
+    }
     board[positiony].splice(positionx,1,marker)
-    gamecontroller.switchturn()
   }
   let Log = function Log(){
     console.log(board)
@@ -24,27 +27,53 @@ const gameboard = (function(){
   return{Reset,Mark,Log,GetBoardStateCopy}
 })();
 const DisplayController = (function(){
+    //Dom Elements that display controller needs
     let player1input = document.querySelector("#playeronename")
     let player2input = document.querySelector("#playertwoname")
-    let submitbutton = document.querySelector("#PlayerNameButton")
+    let playernameform = document.querySelector("#nameform")
+    let PlayAgainButton = document.querySelector("#PlayAgain")
+    let winnertext = document.querySelector("#WinnerText")
+    let winnercontainer = document.querySelector("#Winner")
+    let maincontainer = document.querySelector("#Main")
     let Formsubmit = function Formsubmit(event){
       event.preventDefault()
       let player1inputvalue = player1input.value
       let player2inputvalue = player2input.value
       let player1 = CreateUser(player1inputvalue,1,undefined,false)
       let player2 = CreateUser(player2inputvalue,2,undefined,false)
+      playernameform.style.display = "none"
+      maincontainer.style.display = ""
       gamecontroller.setplayers(player1,player2)
     }
-    submitbutton.addEventListener("click",Formsubmit)
+    playernameform.addEventListener("submit",Formsubmit)
+    let winScreen = function winScreen(winner){
+        winnercontainer.style.display = "block"
+        winnertext.textContent = winner + " Won!"
+    }
+    let tiescreen = function tiescreen(){
+        winnercontainer.style.display = "block"
+        winnertext.textContent = "Tie!"
+    }
+    let playagain = function playagain(){
+        winnercontainer.style.display = "none"
+        gamecontroller.initializegame()
+    }
+    PlayAgainButton.addEventListener("click",playagain)
 
     
-    return{Formsubmit}
+    return{winScreen,tiescreen,playagain}
 
 })();
 function CreateUser(name,playernumber,marker,isitcurrentturn){
   return{name,playernumber,marker,isitcurrentturn}
 }
-
+function StackOverflowexists(arr, search) {
+    return arr.some(row => row.includes(search));
+}
+function ExistThatDoesntworkbyme(array,item){
+    return array.includes(item)
+}
+// the reason this does not work is you are just checking the regular arrays not whats inside them. the other one goes into each individual"row"(array)and checks if just one of them has a empty string with the some array check
 const gamecontroller = (function(){
   let player1
   let player2
@@ -76,27 +105,29 @@ const gamecontroller = (function(){
         for(let i = 0; 2 >= i; i++){
             history.push(boardcopy[i][i])
         }
-        console.log(history)
         if (history.every((value) => value == history[0]) == true && history.every((value) => value != "")){
             console.log("diaggggg")
             return{Win:true, Token:history[0]}
         }
     }
+    
     // Check If any top right to bottem left diagonal wins
-    // Also check ties here in a else if statement due to all win possibilities being checked
     {
         // 2 0   1 1  0 2
         let history = []
         for (let i = 0; 2 >= i; i++){
             history.push(boardcopy[i][2 - i])
         }
-        console.log(history)
         if (history.every((value) => value == history[0]) == true && history.every((value) => value != "")){
             console.log("Other Diag")
             return{Win:true, Token:history[0]}
-        } else if(!boardcopy.includes("")){
-            console.log("Tie")
         }
+    }
+    //check ties
+    if(StackOverflowexists(boardcopy,"") == false){
+        console.log(boardcopy)
+        console.log("Tie")
+        return{Win:"Tie"}
     }
     console.log("No win")
     return{Win:false, Token:undefined}
@@ -141,14 +172,48 @@ const gamecontroller = (function(){
   }
   let playround = function playround(x,y){
     if (player1.isitcurrentturn == true){
-      board.Mark(player1.marker,x,y)
+      if (gameboard.Mark(player1.marker,x,y) == "Invalid"){
+        console.log("Invalid Play Dude")
+        return
+      }
+      let winobject = gamecontroller.checkwin()
+      if (winobject.Win == true && winobject.Token == player1.marker){
+        console.log("Player 1 WON!")
+        DisplayController.winScreen(player1.name)
+        return
+      } else if(winobject.Win == "Tie"){
+        console.log("TIE!")
+        DisplayController.tiescreen()
+        return
+      }
+      switchturn()
+      return
     } else if (player2.isitcurrentturn == true){
-      board.Mark(player2.marker,x,y)
+      if (gameboard.Mark(player2.marker,x,y) == "Invalid"){
+        console.log("Invalid Play Dude")
+        return
+      }
+      let winobject = gamecontroller.checkwin()
+      if (winobject.Win == true && winobject.Token == player2.marker){
+        console.log("Player 2 WON!")
+        DisplayController.winScreen(player2.name)
+        return
+      } else if(winobject.Win == "Tie"){
+        console.log("TIE!")
+        DisplayController.tiescreen()
+        return
+      }
+      gameboard.Log()
+      switchturn()
+      return
+    } else{
+        warn("Error playing round")
     }
   }
   return{checkwin,setplayers,initializegame,switchturn,playround}
 
 })();
+
 
 
 
